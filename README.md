@@ -26,8 +26,6 @@ Contains scripts for the error simulation process.
 **generateData Scripts**: pipeline to generate error models, runs TAPER, and gets the error rates.  
 **unionK.py**: initial script to compute the upper bounded union of running TAPER on various values of *k*.  
 
-## 8000orthologs ##
-Contains initial alignments, TAPER outputs, and Divvier outputs of each gene.
 
 ## Test Data ##
 Contains compressed alignment files (.fasta.gz) and tree files (.tree) used for evaluation.  
