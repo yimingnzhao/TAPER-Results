@@ -107,15 +107,6 @@ names(temp) = names(bs)
 temp$AlignmentName="16S.B-both"
 
 
-bh = cbind(dcast(DiameterRangeGene+N+Diameter~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rf_res",fun.aggregate = mean),
-           dcast(DiameterRangeGene~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rf_err",fun.aggregate = mean)[,2])
-names(bh) = c("DiameterRangeGene","N","Diameter", "rf_res","rf_err")
-bh$m="RF"
-
-bh2 = cbind(dcast(DiameterRangeGene+N+Diameter~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rfw_res",fun.aggregate = mean),
-            dcast(DiameterRangeGene~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rfw_err",fun.aggregate = mean)[,2])
-names(bh2) = c("DiameterRangeGene","N","Diameter", "rf_res","rf_err")
-bh2$m="WRF"
 
 
 recast(AlignmentName~., data=t[t$AlignmentName %in% c("small-10-aa-RV100-BBA0039-DivA","small-10-aa-RV100-BBA0039-Divvier"),c("AlignmentName","time")], fun.ag=mean)
@@ -364,7 +355,11 @@ ggplot(data=t4, aes(FP/(FP+TN), TP/(TP+FN), shape=DiameterRange,color=AlignmentN
   scale_x_continuous(name="FPR",labels=percent,trans = "log2")+
   scale_y_continuous("Recall",labels=percent)
 
-ggplot(aes(color=reorder(AlignmentName,rf_res),x=DR2,y=-(rf_err-rf_res)/(2*N-6)),data=rbind(bs[bs$AlignmentName%in%c("16S.B","16S.B-Divvier"),],temp))+
+
+################## RF
+
+ggplot(aes(color=reorder(AlignmentName,rf_res),x=DR2,y=-(rf_err-rf_res)/(2*N-6)),
+       data=rbind(bs[bs$AlignmentName%in%c("16S.B","16S.B-Divvier"),],temp))+
   geom_jitter(alpha=0.5,position = position_jitterdodge())+
   #geom_point(aes(y=rf_res/(2*N-6)),color="red")+
   theme_classic()+
@@ -395,34 +390,38 @@ ggplot(aes(color=reorder(AlignmentName,rf_res),x=DR2,y=-(rfw_err-rfw_res)),data=
 
 
 ggplot(aes(fill=reorder(AlignmentName,rf_res),x=DR2,y=ifelse(rf_err==0&rf_res==0,0,(rf_err-rf_res)/rf_err)),
-       data=rbind(bs[bs$AlignmentName%in%c("16S.B","16S.B-Divvier"),],temp))+
+       data=rbind(bs[bs$AlignmentName%in%c("16S.B","16S.B-Divvier","16S.B-Trimal"),],temp))+
   geom_hline(yintercept = 0,color="gray70")+
   geom_boxplot(outlier.alpha = 0.7,size=0.5,color="black",outlier.size = 0.2)+
   #geom_violin(draw_quantiles = c(0.25,0.5,0.75))+
   #geom_jitter(alpha=0.5,size=0.4,position = position_jitterdodge())+
   theme_classic()+
   stat_summary(aes(color=reorder(AlignmentName,rf_res)),position = position_dodge(width = 0.75),size=.3)+
-  scale_fill_manual(name="",values=c("#4090B9","#60B9F9","#DF4040") ,labels=c("TAPER (all)","TAPER (239 subset)","Divvier (239 subset)"))+
-  scale_color_manual(name="",values=c("#204060","#103088","#601010") ,labels=c("TAPER (all)","TAPER (239 subset)","Divvier (239 subset)"))+
+  scale_fill_manual(name="",values=c("#4090B9","#60B9F9","#D970F0","#DF4040") ,
+                    labels=c("TAPER (all)","TAPER (239 subset)","trimAl (239 subset)","Divvier (239 subset)"))+
+  scale_color_manual(name="",values=c("#204060","#103088","#9010A0","#601010"),
+                     labels=c("TAPER (all)","TAPER (239 subset)","trimAl (239 subset)","Divvier (239 subset)"))+
   scale_y_continuous("Relative reduction in  RF",labels=percent,lim=c(-1.9,1))+
   scale_x_discrete(name="Diameter")+
-  theme(legend.position = c(.25,.2),legend.direction = "vertical", 
+  theme(legend.position = c(.25,.24),legend.direction = "vertical", 
         plot.tag.position = c(0.01, 0.975),plot.tag = element_text(size=16,face = "bold"))+labs(tag = "d)")+
   ggsave("Figures/ErrParam_Figures/16S-rel-RF.pdf",width = 4.6*0.9,height = 3.8*0.9)
 
 ggplot(aes(fill=reorder(AlignmentName,rf_res),x=DR2,y=(rfw_err-rfw_res)/rfw_err),
-       data=rbind(bs[bs$AlignmentName%in%c("16S.B","16S.B-Divvier"),],temp))+
+       data=rbind(bs[bs$AlignmentName%in%c("16S.B","16S.B-Divvier","16S.B-Trimal"),],temp))+
   geom_hline(yintercept = 0,color="gray70")+
   geom_boxplot(outlier.alpha = 0.7,size=0.5,color="black",outlier.size = 0.2)+
   #geom_violin(draw_quantiles = c(0.25,0.5,0.75))+
   #geom_jitter(alpha=0.5,size=0.4,position = position_jitterdodge())+
   theme_classic()+
   stat_summary(aes(color=reorder(AlignmentName,rf_res)),position = position_dodge(width = 0.75),size=.3)+
-  scale_fill_manual(name="",values=c("#4090B9","#60B9F9","#DF4040") ,labels=c("TAPER (all)","TAPER (239 subset)","Divvier (239 subset)"))+
-  scale_color_manual(name="",values=c("#204060","#103088","#601010") ,labels=c("TAPER (all)","TAPER (239 subset)","Divvier (239 subset)"))+
-  scale_y_continuous("Relative reduction in  RF",labels=percent,lim=c(-1.9,1))+
+  scale_fill_manual(name="",values=c("#4090B9","#60B9F9","#D970F0","#DF4040") ,
+                    labels=c("TAPER (all)","TAPER (239 subset)","trimAl (239 subset)","Divvier (239 subset)"))+
+  scale_color_manual(name="",values=c("#204060","#103088","#9010A0","#601010"),
+                     labels=c("TAPER (all)","TAPER (239 subset)","trimAl (239 subset)","Divvier (239 subset)"))+
+  scale_y_continuous("Relative reduction in  WRF",labels=percent,lim=c(-1.9,1))+
   scale_x_discrete(name="Diameter")+
-  theme(legend.position = c(.25,.2),legend.direction = "vertical", 
+  theme(legend.position = c(.25,.24),legend.direction = "vertical", 
         plot.tag.position = c(0.01, 0.975),plot.tag = element_text(size=16,face = "bold"))+labs(tag = "e)")+
   ggsave("Figures/ErrParam_Figures/16S-RFw-change.pdf",width = 4.6*0.9,height = 3.8*0.9)
 
@@ -441,7 +440,7 @@ ggplot(aes(fill=reorder(AlignmentName,rf_res),x=DR2,y=(rfw_err-rfw_res)/rfw_err)
  ggsave("Figures/ErrParam_Figures/16S-RF-error.pdf",width = 2.68*1.1,height = 3.5*1.1)
   
 ggplot(aes(color=relevel(relevel(AlignmentName,"small-10-aa-RV100-BBA0039-Divvier"),"small-10-aa-RV100-BBA0039-DivA")),
-       data=bs[grepl("small-10-a",bs$AlignmentName),])+
+       data=bs[grepl("small-10-a",bs$AlignmentName) ,])+
   geom_hline(yintercept = 0,color="gray40",linetype=1)+
   geom_violin(aes(y=(rf_err-rf_res)/(rf_err),x="RF"),draw_quantiles = c(0.25,0.5,0.75))+
   geom_violin(aes(y=(rfw_err-rfw_res)/(rfw_err),x="WRF"),draw_quantiles = c(0.25,0.5,0.75))+
@@ -449,48 +448,9 @@ ggplot(aes(color=relevel(relevel(AlignmentName,"small-10-aa-RV100-BBA0039-Divvie
   theme(legend.position = c(.32,.24), legend.text.align = 0,
                       plot.tag.position = c(0.01, 0.975),plot.tag = element_text(size=12,face = "bold"))+labs(tag = "f)")+
   scale_y_continuous(name="Relative reduction in RF",labels=percent)+
-  scale_color_brewer(palette = "Dark2",name=element_blank(),labels=c("DivA","Divvier","TAPER"))+
+  scale_color_brewer(palette = "Dark2",name=element_blank(),labels=c("DivA","Divvier","TAPER","trimAl"))+
   scale_x_discrete(name=element_blank())+
   ggsave("Figures/ErrParam_Figures/small-10-aa_RF.pdf",width = 3,height =4)
-
-ggplot(aes(color=N,x=DiameterRangeGene,y=(value-after)),data=bs2[bs2$AlignmentName=="16S.B",])+geom_point()+
-  #geom_point(aes(y=rf_res/(2*N-6)),color="red")+
-  theme_bw()+stat_summary(fill="transparent",color="red")+
-  facet_wrap(.~v,scales = "free")
-
-
-
-
-
-ggplot(aes(yend=rf_res/(2*N-6),y=rf_err/(2*N-6),x=reorder(DiameterRangeGene,rf_err/(2*N-6)),xend=reorder(DiameterRangeGene,rf_err),
-           shape=rf_res>rf_err,color=Diameter),
-       data=bh)+
-  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
-  geom_segment(size=0.8,arrow = arrow(length=unit(0.2,"cm")))+
-  #stat_summary(position = position_dodge(width=0.3),geom="line")+
-  theme_classic()+
-  theme(legend.position = c(.27,.891),legend.direction = "horizontal", legend.text.align = 1,axis.text.x = element_text(angle=90))+
-  scale_y_continuous(name="Normalized RF error",labels=percent)+
-  scale_shape(name="")+
-  scale_x_discrete(name="")+
-  scale_color_gradient(low = "#55BBFF",high = "#112244",name="Diameter")+
-  ggsave("Figures/ErrParam_Figures/Hacket-RF.pdf",width = 5.2,height = 5)
-
-
-ggplot(aes(yend=rf_res,y=rf_err,x=reorder(DiameterRangeGene,rf_err/(2*N-6)),xend=reorder(DiameterRangeGene,rf_err),
-           shape=rf_res>rf_err,color=Diameter),
-       data=bh2)+
-  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
-  geom_segment(size=0.8,arrow = arrow(length=unit(0.2,"cm")))+
-  #stat_summary(position = position_dodge(width=0.3),geom="line")+
-  theme_classic()+
-  theme(legend.position = c(.27,.891),legend.direction = "horizontal", legend.text.align = 1,axis.text.x = element_text(angle=90))+
-  scale_y_continuous(name="WRF error")+
-  scale_shape(name="")+
-  scale_x_discrete(name="")+
-  scale_color_gradient(low = "#55BBFF",high = "#112244",name="Diameter")+
-  ggsave("Figures/ErrParam_Figures/Hacket-wRF.pdf",width = 5,height = 5)
-
 
 
 ggplot(aes(ymax=rf_res/(2*N-6),ymin=rf_err/(2*N-6),
@@ -524,14 +484,98 @@ ggplot(aes(yend=rfw_res,y=rfw_err,x=reorder(Rep,rf_err/(2*N-6)),xend=reorder(Rep
   scale_color_brewer(name="",palette = "Dark2",labels=c("TAPER","DivA"))+
   ggsave("Figures/ErrParam_Figures/AA-wRF.pdf",width = 5.2,height = 5)
 
+
+bh = cbind(dcast(DiameterRangeGene+N+Diameter~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rf_res",fun.aggregate = mean),
+           dcast(DiameterRangeGene~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rf_err",fun.aggregate = mean)[,2])
+names(bh) = c("DiameterRangeGene","N","Diameter", "rf_res","rf_err")
+bh$m="RF"
+
+bh2 = cbind(dcast(DiameterRangeGene+N+Diameter~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rfw_res",fun.aggregate = mean),
+            dcast(DiameterRangeGene~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rfw_err",fun.aggregate = mean)[,2])
+names(bh2) = c("DiameterRangeGene","N","Diameter", "rf_res","rf_err")
+bh2$m="WRF"
+
+ggplot(aes(yend=rf_res/(2*N-6),y=rf_err/(2*N-6),x=reorder(DiameterRangeGene,rf_err/(2*N-6)),xend=reorder(DiameterRangeGene,rf_err),
+           shape=rf_res>rf_err,color=Diameter),
+       data=bh)+
+  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
+  geom_segment(size=0.8,arrow = arrow(length=unit(0.2,"cm")))+
+  #stat_summary(position = position_dodge(width=0.3),geom="line")+
+  theme_classic()+
+  theme(legend.position = c(.27,.891),legend.direction = "horizontal", legend.text.align = 1,axis.text.x = element_text(angle=90))+
+  scale_y_continuous(name="Normalized RF error",labels=percent)+
+  scale_shape(name="")+
+  scale_x_discrete(name="")+
+  scale_color_gradient(low = "#55BBFF",high = "#112244",name="Diameter")+
+  ggsave("Figures/ErrParam_Figures/Hacket-RF.pdf",width = 5.2,height = 5)
+
+
+ggplot(aes(yend=rf_res,y=rf_err,x=reorder(DiameterRangeGene,rf_err/(2*N-6)),xend=reorder(DiameterRangeGene,rf_err),
+           shape=rf_res>rf_err,color=Diameter),
+       data=bh2)+
+  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
+  geom_segment(size=0.8,arrow = arrow(length=unit(0.2,"cm")))+
+  #stat_summary(position = position_dodge(width=0.3),geom="line")+
+  theme_classic()+
+  theme(legend.position = c(.27,.891),legend.direction = "horizontal", legend.text.align = 1,axis.text.x = element_text(angle=90))+
+  scale_y_continuous(name="WRF error")+
+  scale_shape(name="")+
+  scale_x_discrete(name="")+
+  scale_color_gradient(low = "#55BBFF",high = "#112244",name="Diameter")+
+  ggsave("Figures/ErrParam_Figures/Hacket-wRF.pdf",width = 5,height = 5)
+
+go=d[ (d$E =="Hackett_Genes_ErrLen") &d$ErrLen<64 & d$DR!="concat" &d$ErrLen == 8 &d$n=="5%"&d$Rep==0,"SL"]
+hb=ggplot()+
+  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
+  geom_segment(aes(yend=rf_res,y=rf_err,x=reorder(DiameterRangeGene,go),xend=reorder(DiameterRangeGene,go),
+                   color="WRF"), size=0.8,arrow = arrow(length=unit(0.2,"cm")),data=bh2[bh2$DiameterRangeGene != "concat",])+
+  geom_segment(aes(yend=5*rf_res/(2*N-6),y=5*rf_err/(2*N-6),x=reorder(DiameterRangeGene,go),xend=reorder(DiameterRangeGene,go),
+                   color="RF"), size=0.8,arrow = arrow(length=unit(0.2,"cm")),position =position_nudge(x=0.3),data=bh[bh$DiameterRangeGene != "concat",])+
+  #stat_summary(position = position_dodge(width=0.3),geom="line")+
+  theme_classic()+
+  theme(legend.position = c(.2,.91),legend.direction = "horizontal", legend.text.align = 1,#axis.text.x = element_text(angle=90), 
+        plot.tag.position = c(0.01, 0.975),plot.tag = element_text(size=15,face = "bold"))+labs(tag = "c)")+
+  scale_y_continuous(name="WRF error",
+                     sec.axis = sec_axis(~./5, name="RF",labels = percent))+
+  scale_x_discrete(name="")+
+  scale_color_manual(name="",values = c("#003092","#60D290"))
+#scale_color_gradient(low = "#55BBFF",high = "#112244",name="Diameter")+
+hb
+ggsave("Figures/ErrParam_Figures/Hacket-both.pdf",width = 9,height =3.2)
+
   #facet_wrap(~E,labeller = function(x) list(E=c("Changing Error Length","Changing Error Frequency")),scales="free_x",shrink = T)+
   #scale_color_brewer(palette = "Dark2",name="Diameter",guide="none")#+geom_hline(yintercept = 0.0003)
 
-ggplot(aes(x=DiameterRangeGene,y=(rf_err-rf_res)/(2*N-6)),data=bs)+geom_point()+
-  #geom_point(aes(y=rf_res/(2*N-6)),color="red")+
-  theme_bw()
+
+bh = cbind(dcast(DiameterRangeGene+N+Diameter~.,data=bs[bs$AlignmentName=="HackettGenes-Trimal",],value.var = "rf_res",fun.aggregate = mean),
+           dcast(DiameterRangeGene~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rf_err",fun.aggregate = mean)[,2])
+names(bh) = c("DiameterRangeGene","N","Diameter", "rf_res","rf_err")
+bh$m="RF"
+
+bh2 = cbind(dcast(DiameterRangeGene+N+Diameter~.,data=bs[bs$AlignmentName=="HackettGenes-Trimal",],value.var = "rfw_res",fun.aggregate = mean),
+            dcast(DiameterRangeGene~.,data=bs[bs$AlignmentName=="HackettGenes",],value.var = "rfw_err",fun.aggregate = mean)[,2])
+names(bh2) = c("DiameterRangeGene","N","Diameter", "rf_res","rf_err")
+bh2$m="WRF"
+
+go=d[ (d$E =="Hackett_Genes_ErrLen") &d$ErrLen<64 & d$DR!="concat" &d$ErrLen == 8 &d$n=="5%"&d$Rep==0,"SL"]
+ggplot()+
+  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
+  geom_segment(aes(yend=rf_res,y=rf_err,x=reorder(DiameterRangeGene,go),xend=reorder(DiameterRangeGene,go),
+                   color="WRF"), size=0.8,arrow = arrow(length=unit(0.2,"cm")),data=bh2[bh2$DiameterRangeGene != "concat",])+
+  geom_segment(aes(yend=5*rf_res/(2*N-6),y=5*rf_err/(2*N-6),x=reorder(DiameterRangeGene,go),xend=reorder(DiameterRangeGene,go),
+                   color="RF"), size=0.8,arrow = arrow(length=unit(0.2,"cm")),position =position_nudge(x=0.3),data=bh[bh$DiameterRangeGene != "concat",])+
+  #stat_summary(position = position_dodge(width=0.3),geom="line")+
+  theme_classic()+
+  theme(legend.position = c(.2,.91),legend.direction = "horizontal", legend.text.align = 1,#axis.text.x = element_text(angle=90), 
+        plot.tag.position = c(0.01, 0.975),plot.tag = element_text(size=15,face = "bold"))+labs(tag = "c)")+
+  scale_y_continuous(name="WRF error",
+                     sec.axis = sec_axis(~./5, name="RF",labels = percent))+
+  scale_x_discrete(name="")+
+  scale_color_manual(name="",values = c("#003092","#60D290"))
+ggsave("Figures/ErrParam_Figures/Hacket-TrimAl.pdf",width = 9,height =3.2)
 
 
+##########################
 
 
 ggplot(aes(color=DR2,yend=FN/(FN+TN),y=(FN+TP)/(FN+FP+TP+TN),x=interaction(ErrLenT,n,sep=", "),xend=interaction(ErrLenT,n,sep=", ")),
@@ -754,24 +798,7 @@ ggplot(aes(x=reorder(paste(DR,round(Diameter,3),round(SL,0),as.numeric(as.charac
 ggsave("Figures/ErrParam_Figures/Hackett_NumErr_percenterror.pdf",width = 9,height = 6.5)
 
 
-go=d[ (d$E =="Hackett_Genes_ErrLen") &d$ErrLen<64 & d$DR!="concat" &d$ErrLen == 8 &d$n=="5%"&d$Rep==0,"SL"]
-hb=ggplot()+
-  #geom_boxplot(outlier.alpha = .5, outlier.size = 0.4)+#geom_point(alpha=0.5,size=1)+
-  geom_segment(aes(yend=rf_res,y=rf_err,x=reorder(DiameterRangeGene,go),xend=reorder(DiameterRangeGene,go),
-                   color="WRF"), size=0.8,arrow = arrow(length=unit(0.2,"cm")),data=bh2[bh2$DiameterRangeGene != "concat",])+
-  geom_segment(aes(yend=5*rf_res/(2*N-6),y=5*rf_err/(2*N-6),x=reorder(DiameterRangeGene,go),xend=reorder(DiameterRangeGene,go),
-                   color="RF"), size=0.8,arrow = arrow(length=unit(0.2,"cm")),position =position_nudge(x=0.3),data=bh[bh$DiameterRangeGene != "concat",])+
-  #stat_summary(position = position_dodge(width=0.3),geom="line")+
-  theme_classic()+
-  theme(legend.position = c(.2,.91),legend.direction = "horizontal", legend.text.align = 1,#axis.text.x = element_text(angle=90), 
-        plot.tag.position = c(0.01, 0.975),plot.tag = element_text(size=15,face = "bold"))+labs(tag = "c)")+
-  scale_y_continuous(name="WRF error",
-                     sec.axis = sec_axis(~./5, name="RF",labels = percent))+
-  scale_x_discrete(name="")+
-  scale_color_manual(name="",values = c("#003092","#60D290"))
-#scale_color_gradient(low = "#55BBFF",high = "#112244",name="Diameter")+
-hb
-ggsave("Figures/ErrParam_Figures/Hacket-both.pdf",width = 9,height =3.2)
+
 
 haf=ggplot(aes(x=reorder(paste(DR,round(Diameter,3),round(SL,0),as.numeric(as.character(N)),sep="\n"),
                      SL),
