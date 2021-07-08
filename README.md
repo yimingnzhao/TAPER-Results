@@ -35,10 +35,14 @@ Contains compressed alignment files (.fasta.gz) and tree files (.tree) used for 
 **16S.B Error Trees**: error .tree files corresponding to the error .fasta alignments for 16S.B generalized testing.  
 **16S.B Divver**: alignment results of running Divvier on 16S.B generalized testing.  
 **16S.B Divvier Trees**: .tree files of Divvier results corresponding to the alignment files.  
+**16S.B Trimal**: alignment results of running trimal -automated1 on 16S.B generalized testing.  
+**16S.B Trimal Trees**: .tree files of trimal results corresponding to the alignment files.  
 **Hackett Orig**: original .fasta alignments for the Hackett dataset.  
 **Hackett Orig Trees**: original .tree files corresponding to the original .fasta alignments for Hackett.  
 **Hackett Error**: error .fasta alignments with varying error lengths and varying percentage of erroneous sequences for Hackett.  
 **Hackett Error Trees**: error .tree files corresponding to the Hackett error .fasta files.  
+**Hackett Trimal**: alignment results of running trimal -automated1 on Hackett testing.  
+**Hackett Trimal Trees**: .tree files of trimal results corresponding to the alignment files.  
 **small-10-aa Orig**: original .fasta alignment for small-10-aa-RV100-BBA0039.   
 **small-10-aa Orig Trees**: original .tree file corresponding to the .fasta alignment for small-10-aa-RV100-BBA0039.  
 **small-10-aa Error**: error .fasta alignments with varying error lengths and varying percentage of erroneous sequences for small-10-aa-RV100-BBA0039.  
@@ -47,6 +51,8 @@ Contains compressed alignment files (.fasta.gz) and tree files (.tree) used for 
 **small-10-aa Divvier Trees**: .tree files of Divvier results corresponding to the alignment files.  
 **small-10-aa DivA**: alignment results of running Divvier on small-10-aa error alignments with error length 88 and 5% of erroneous sequences.  
 **small-10-aa DivA Trees**: .tree files of DivA results corresponding to the alignment files.  
+**small-10-aa Trimal**: alignment results of running trimal -automated1 on small-10-aa testing.  
+**small-10-aa Trimal Trees**: .tree files of trimal results corresponding to the alignment files.  
 
 
 ## multi-parameters ##
